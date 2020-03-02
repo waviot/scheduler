@@ -30,21 +30,6 @@ struct watimer_callback_st
 #define SECONDS(x) ((uint32_t)(x) * 1000)
 #define MILLISECONDS(x) (x)
 
-/*
-enum watimer_func_t
-{
-	WATIMER_GLOBAL_IRQ_ENABLE,
-	WATIMER_GLOBAL_IRQ_DISABLE,
-	WATIMER_CC_IRQ_ENABLE,
-	WATIMER_CC_IRQ_DISABLE,
-	WATIMER_SET_CC,
-	WATIMER_GET_CC,
-	WATIMER_GET_CNT,
-	WATIMER_CHECK_CC_IRQ,
-};
-*/
-
-
 
 typedef struct 
 {
