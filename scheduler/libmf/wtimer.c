@@ -9,54 +9,8 @@ struct wtimer_state wtimer_state[2];
 struct wtimer_callback * wtimer_pending;
 
 
-/*
-void (* __global_irq_enable)(void);
-void (* __global_irq_disable)(void);
-void (* __cc_irq_enable)(uint8_t chan);
-void (* __cc_irq_disable)(uint8_t chan);
-void (* __cc_set)(uint8_t chan, uint16_t data);
-uint16_t (* __cc_get)(uint8_t chan);
-uint16_t (* __cnt_get)(uint8_t chan);
-uint8_t (* __check_cc_irq)(uint8_t chan);
-*/
-
 wtimer_HAL_st *wtimer_hal = 0;
 
-/*
-void wtimer_reg_func(uint8_t name, void *fn)
-{
-	switch(name)
-	{
-	case WTIMER_GLOBAL_IRQ_ENABLE:
-		__global_irq_enable = (void(*)(void))fn;
-		break;
-	case WTIMER_GLOBAL_IRQ_DISABLE:
-		__global_irq_disable = (void(*)(void))fn;
-		break;
-	case WTIMER_CC_IRQ_ENABLE:
-		__cc_irq_enable = (void(*)(uint8_t))fn;
-		break;
-	case WTIMER_CC_IRQ_DISABLE:
-		__cc_irq_disable = (void(*)(uint8_t))fn;
-		break;
-	case WTIMER_SET_CC:
-		__cc_set = (void(*)(uint8_t,uint16_t))fn;
-		break;
-	case WTIMER_GET_CC:
-		__cc_get = (uint16_t(*)(uint8_t))fn;
-		break;
-	case WTIMER_GET_CNT:
-		__cnt_get = (uint16_t(*)(uint8_t))fn;
-		break;
-	case WTIMER_CHECK_CC_IRQ:
-		__check_cc_irq = (uint8_t(*)(uint8_t))fn;
-		break;
-	default:
-		break;
-	}
-}
-
-*/
 
 void wtimer_set_HAL(wtimer_HAL_st *ptr)
 {
