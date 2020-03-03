@@ -1,56 +1,11 @@
 #include <string.h>
-#include "watimer.h"
+#include "watimer\watimer.h"
 
 volatile uint32_t watimer_time;
 
 volatile uint8_t  callbacks_num;
 
 struct watimer_callback_st* watimer_callbacks[MAXCALLBACKS];
-
-/*
-void (* __global_irq_enable)(void);
-void (* __global_irq_disable)(void);
-void (* __cc_irq_enable)(uint8_t chan);
-void (* __cc_irq_disable)(uint8_t chan);
-void (* __cc_set)(uint8_t chan, uint16_t data);
-uint16_t (* __cc_get)(uint8_t chan);
-uint16_t (* __cnt_get)(uint8_t chan);
-uint8_t (* __check_cc_irq)(uint8_t chan);
-*/
-/*
-void watimer_reg_func(uint8_t name, void *fn)
-{
-	switch(name)
-	{
-	case WATIMER_GLOBAL_IRQ_ENABLE:
-		__global_irq_enable = (void(*)(void))fn;
-		break;
-	case WATIMER_GLOBAL_IRQ_DISABLE:
-		__global_irq_disable = (void(*)(void))fn;
-		break;
-	case WATIMER_CC_IRQ_ENABLE:
-		__cc_irq_enable = (void(*)(uint8_t))fn;
-		break;
-	case WATIMER_CC_IRQ_DISABLE:
-		__cc_irq_disable = (void(*)(uint8_t))fn;
-		break;
-	case WATIMER_SET_CC:
-		__cc_set = (void(*)(uint8_t,uint16_t))fn;
-		break;
-	case WATIMER_GET_CC:
-		__cc_get = (uint16_t(*)(uint8_t))fn;
-		break;
-	case WATIMER_GET_CNT:
-		__cnt_get = (uint16_t(*)(uint8_t))fn;
-		break;
-	case WATIMER_CHECK_CC_IRQ:
-		__check_cc_irq = (uint8_t(*)(uint8_t))fn;
-		break;
-	default:
-		break;
-	}
-}
-*/
 
 watimer_HAL_st *watimer_hal = 0;
 

@@ -1,90 +1,7 @@
 #include "nbfi_defines.h"
 #include "scheduler.h"
 
-/*
-void scheduler_reg_func(uint8_t name, void *fn)
-{
-  #ifdef WTIMER  
-	switch(name)
-	{
-	case SCHEDULER_GLOBAL_IRQ_ENABLE:
-                wtimer_reg_func(WTIMER_GLOBAL_IRQ_ENABLE, fn);
-		break;
-	case SCHEDULER_GLOBAL_IRQ_DISABLE:
-		wtimer_reg_func(WTIMER_GLOBAL_IRQ_DISABLE, fn);
-		break;
-	case SCHEDULER_CC_IRQ_ENABLE:
-		wtimer_reg_func(WTIMER_CC_IRQ_ENABLE, fn);
-		break;
-	case SCHEDULER_CC_IRQ_DISABLE:
-		wtimer_reg_func(WTIMER_CC_IRQ_DISABLE, fn);
-		break;
-	case SCHEDULER_SET_CC:
-		wtimer_reg_func(WTIMER_SET_CC, fn);
-		break;
-	case SCHEDULER_GET_CC:
-		wtimer_reg_func(WTIMER_GET_CC, fn);
-		break;
-	case SCHEDULER_GET_CNT:
-		wtimer_reg_func(WTIMER_GET_CNT, fn);
-		break;
-	case SCHEDULER_CHECK_CC_IRQ:
-		wtimer_reg_func(WTIMER_CHECK_CC_IRQ, fn);
-		break;
-	default:
-		break;
-	}
-#else
-        switch(name)
-	{
-	case SCHEDULER_GLOBAL_IRQ_ENABLE:
-                watimer_reg_func(WATIMER_GLOBAL_IRQ_ENABLE, fn);
-		break;
-	case SCHEDULER_GLOBAL_IRQ_DISABLE:
-		watimer_reg_func(WATIMER_GLOBAL_IRQ_DISABLE, fn);
-		break;
-	case SCHEDULER_CC_IRQ_ENABLE:
-		watimer_reg_func(WATIMER_CC_IRQ_ENABLE, fn);
-		break;
-	case SCHEDULER_CC_IRQ_DISABLE:
-		watimer_reg_func(WATIMER_CC_IRQ_DISABLE, fn);
-		break;
-	case SCHEDULER_SET_CC:
-		watimer_reg_func(WATIMER_SET_CC, fn);
-		break;
-	case SCHEDULER_GET_CC:
-		watimer_reg_func(WATIMER_GET_CC, fn);
-		break;
-	case SCHEDULER_GET_CNT:
-		watimer_reg_func(WATIMER_GET_CNT, fn);
-		break;
-	case SCHEDULER_CHECK_CC_IRQ:
-		watimer_reg_func(WATIMER_CHECK_CC_IRQ, fn);
-		break;
-	default:
-		break;
-	}
-#endif
-}
-*/
-
-void scheduler_set_HAL(scheduler_HAL_st *ptr)
-{
-  #ifdef WTIMER
-  wtimer_set_HAL(ptr);
-  #else 
-  watimer_set_HAL(ptr);
-  #endif
-}
-
-void scheduler_init()
-{
-  #ifdef WTIMER
-  wtimer_init();
-  #else 
-  watimer_init();
-  #endif
-}
+ischeduler_st scheduler_inst;
 
 void scheduler_irq()
 {
@@ -138,4 +55,21 @@ uint32_t scheduler_current_time()
   #else
   return watimer_time;
   #endif
+}
+
+ischeduler_st* scheduler_init(scheduler_HAL_st *ptr)
+{
+  #ifdef WTIMER
+  wtimer_set_HAL(ptr);
+  wtimer_init();
+  #else 
+  watimer_set_HAL(ptr);
+  watimer_init();
+  #endif
+  
+  scheduler_inst.__scheduler_add_task = &scheduler_add_task;
+  scheduler_inst.__scheduler_run_callbacks = &scheduler_run_callbacks;
+  scheduler_inst.__scheduler_remove_task = &scheduler_remove_task;
+  scheduler_inst.__scheduler_curr_time = &scheduler_curr_time;
+  return &scheduler_inst;
 }

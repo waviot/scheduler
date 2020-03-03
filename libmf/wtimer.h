@@ -1,7 +1,7 @@
 #ifndef WTIMER_H
 #define WTIMER_H
 
-#include "libmfwtimer.h"
+#include "libmf\libmfwtimer.h"
 
 #define SECONDS(x) 		((uint32_t)(x) * 1000)
 #define MILLISECONDS(x) (SECONDS(x) / 1000)
@@ -38,19 +38,6 @@ extern void wtimer0_update(void);
 extern void wtimer0_addcore(struct wtimer_desc *desc);
 extern uint8_t wtimer0_removecb_core(struct wtimer_desc *desc);
 uint8_t wtimer_idle(uint8_t flags);
-
-/*
-enum wtimer_func_t
-{
-	WTIMER_GLOBAL_IRQ_ENABLE,
-	WTIMER_GLOBAL_IRQ_DISABLE,
-	WTIMER_CC_IRQ_ENABLE,
-	WTIMER_CC_IRQ_DISABLE,
-	WTIMER_SET_CC,
-	WTIMER_GET_CC,
-	WTIMER_GET_CNT,
-	WTIMER_CHECK_CC_IRQ,
-};*/
 
 
 typedef struct 

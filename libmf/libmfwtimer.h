@@ -28,7 +28,7 @@ struct wtimer_desc {
 #define WTIDLE_WORK                     0x01
 #define WTIDLE_SLEEP                    0x02
 
-extern void wtimer_init(void);
+extern void wtimer_init();
 extern void wtimer_init_deepsleep(void);
 extern uint8_t wtimer_idle(uint8_t flags);
 extern uint8_t wtimer_runcallbacks(void);
