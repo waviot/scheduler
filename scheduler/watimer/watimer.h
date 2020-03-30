@@ -58,6 +58,7 @@ void watimer_run_callbacks();
 void watimer_add_callback(struct watimer_callback_st *desc, watimer_callback_func cb, watimer_run_mode_en run_level, uint32_t period);
 void watimer_remove_callback(struct watimer_callback_st *desc);
 _Bool watimer_check_callback(struct watimer_callback_st *desc);
+_Bool watimer_can_sleep();
 uint32_t watimer_update_time();
 
 

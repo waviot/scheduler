@@ -18,57 +18,16 @@ uint32_t watimer_update_time()
 {
     static uint32_t old_watimer_time = 0;
     
+   
     watimer_time &= 0xffff0000;
     watimer_time += watimer_hal->__cnt_get(0);
     
     if(old_watimer_time > watimer_time) watimer_time += 0x10000;
+       
+     //   if((old_watimer_time == watimer_time) &&(watimer_time == 3085))
+     // watimer_time++;
     
     return (old_watimer_time = watimer_time);
-}
-
-static void watimer_configure_next_irq_time()
-{
-  
-  uint32_t irq_time = 0;
-  _Bool pending = 0;
-  for(uint8_t i = 0; i < callbacks_num; i++)
-  {
-    if(watimer_callbacks[i] && (watimer_callbacks[i]->timeout == 0))
-    {
-       pending = 1;
-       if(watimer_callbacks[i]->timer > irq_time) irq_time = watimer_callbacks[i]->timer;
-    }
-  }
-  
-  if(pending)
-  {
-    watimer_hal->__cc_irq_enable(0);
-    watimer_update_time();
-    
-    if((irq_time&0xffff) - ((watimer_time + MILLISECONDS(5))&0xffff) < 0x8000)
-    watimer_hal->__cc_set(0, irq_time&0xffff);
-    else 
-    {
-      if(!watimer_hal->__check_cc_irq(0)) 
-      {
-        watimer_hal->__cc_set(0, watimer_hal->__cnt_get(0) + MILLISECONDS(5));
-      }
-    }
-  }
-  else
-  {
-    watimer_hal->__cc_irq_disable(0);
-  }
-
-}
-
-
-void watimer_init(void)
-{
-  if(watimer_hal == 0) while(1); //HAL struct must be configured before library usage 
-  watimer_time = watimer_hal->__cnt_get(0);
-  callbacks_num = 0;
-  memset(((uint8_t*)(&watimer_callbacks[0])), 0, sizeof(watimer_callbacks));  
 }
 
 
@@ -89,9 +48,79 @@ static void watimer_update_callbacks()
 }
 
 
+static _Bool watimer_configure_next_irq_time()
+{
+  
+  uint32_t irq_time = 0xffffffff;
+  _Bool pending = 0;
+  _Bool timeout = 0;
+  watimer_update_callbacks();
+  for(uint8_t i = 0; i < callbacks_num; i++)
+  {
+    if(watimer_callbacks[i]->timeout)
+    {
+      timeout = 1;
+      continue;
+    }
+    
+    if(watimer_callbacks[i])
+    {
+       pending = 1;
+       if(watimer_callbacks[i]->timer < irq_time) irq_time = watimer_callbacks[i]->timer;
+    }
+  }
+  
+  if(pending)
+  {
+    watimer_hal->__cc_irq_enable(0);
+    watimer_update_time();
+   //   if(watimer_time == 3085)
+   //   watimer_time++;
+    if(((irq_time&0xffff) - ((watimer_time + MILLISECONDS(5))&0xffff)) < 0x8000)
+    {
+      watimer_hal->__cc_set(0, irq_time&0xffff);
+    }
+    else 
+    {
+      if(!watimer_hal->__check_cc_irq(0)) 
+      {
+        watimer_hal->__cc_set(0, watimer_hal->__cnt_get(0) + MILLISECONDS(5));
+      }
+      else
+      {
+        watimer_hal->__cc_irq_disable(0);
+        watimer_hal->__cc_irq_enable(0);
+        watimer_hal->__cc_set(0, watimer_hal->__cnt_get(1) + MILLISECONDS(5));
+      }
+    }
+  }
+  else
+  {
+    //timeout = 1;
+   // watimer_hal->__cc_set(0, watimer_hal->__cnt_get(1) + SECONDS(10));
+  }
+
+
+  
+  
+  return timeout;
+}
+
+
+void watimer_init(void)
+{
+  if(watimer_hal == 0) while(1); //HAL struct must be configured before library usage 
+  watimer_time = watimer_hal->__cnt_get(0);
+  callbacks_num = 0;
+  memset(((uint8_t*)(&watimer_callbacks[0])), 0, sizeof(watimer_callbacks));  
+}
+
+
+
 void watimer_irq(void)
 {   
-    watimer_configure_next_irq_time();
+    //watimer_configure_next_irq_time();
+    watimer_run_callbacks();
 }
 
 void watimer_run_callbacks()
@@ -119,10 +148,24 @@ void watimer_run_callbacks()
 	   		}
 	   	}
 	 }
-         watimer_configure_next_irq_time();
+         if(watimer_configure_next_irq_time()) watimer_run_callbacks();
          watimer_hal->__global_irq_enable(); 
 }
-
+uint16_t diff;
+_Bool watimer_can_sleep()
+{
+  _Bool soon = 0;
+  watimer_hal->__global_irq_disable();
+  diff = watimer_hal->__cc_get(0) - watimer_hal->__cnt_get(0);
+  if(diff < 3) soon = 1; 
+  watimer_hal->__global_irq_enable(); 
+  /*if((!soon) && (!watimer_hal->__check_cc_irq(0)))
+  {
+    return (!soon);
+  }
+  else return 0;*/
+  return (!soon) && (!watimer_hal->__check_cc_irq(0));
+}
 
 void watimer_add_callback(struct watimer_callback_st* desc, watimer_callback_func cb, watimer_run_mode_en run_level, uint32_t period)
 {

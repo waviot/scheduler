@@ -21,6 +21,16 @@ void scheduler_run_callbacks()
   #endif
 }
 
+
+_Bool scheduler_can_sleep()
+{
+  #ifdef WTIMER
+  return 1;
+  #else
+  return watimer_can_sleep();
+  #endif
+}
+
 uint32_t scheduler_curr_time()
 {
   #ifdef WTIMER
