@@ -57,7 +57,7 @@ static _Bool watimer_configure_next_irq_time()
   watimer_update_callbacks();
   for(uint8_t i = 0; i < callbacks_num; i++)
   {
-    if(watimer_callbacks[i]->timeout)
+    if(watimer_callbacks[i] && watimer_callbacks[i]->timeout)
     {
       timeout = 1;
       continue;
@@ -76,7 +76,8 @@ static _Bool watimer_configure_next_irq_time()
     watimer_update_time();
    //   if(watimer_time == 3085)
    //   watimer_time++;
-    if(((irq_time&0xffff) - ((watimer_time + MILLISECONDS(5))&0xffff)) < 0x8000)
+    //if(((irq_time&0xffff) - ((watimer_time + MILLISECONDS(5))&0xffff)) < 0x8000)
+    if(irq_time > (watimer_time + MILLISECONDS(5)))
     {
       watimer_hal->__cc_set(0, irq_time&0xffff);
     }
@@ -159,12 +160,8 @@ _Bool watimer_can_sleep()
   diff = watimer_hal->__cc_get(0) - watimer_hal->__cnt_get(0);
   if(diff < 3) soon = 1; 
   watimer_hal->__global_irq_enable(); 
-  /*if((!soon) && (!watimer_hal->__check_cc_irq(0)))
-  {
-    return (!soon);
-  }
-  else return 0;*/
-  return (!soon) && (!watimer_hal->__check_cc_irq(0));
+  
+  return (!soon);
 }
 
 void watimer_add_callback(struct watimer_callback_st* desc, watimer_callback_func cb, watimer_run_mode_en run_level, uint32_t period)
