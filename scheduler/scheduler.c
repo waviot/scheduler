@@ -7,7 +7,7 @@ void scheduler_irq()
 {
   #ifdef WTIMER
   wtimer_cc0_irq();
-  #else   
+  #else
   watimer_irq();
   #endif
 }
@@ -67,16 +67,16 @@ uint32_t scheduler_current_time()
   #endif
 }
 
-ischeduler_st* scheduler_init(scheduler_HAL_st *ptr)
+ischeduler_st* scheduler_init(scheduler_HAL_st *ptr, uint32_t clock_div)
 {
   #ifdef WTIMER
   wtimer_set_HAL(ptr);
   wtimer_init();
-  #else 
+  #else
   watimer_set_HAL(ptr);
-  watimer_init();
+  watimer_init(clock_div);
   #endif
-  
+
   scheduler_inst.__scheduler_add_task = &scheduler_add_task;
   scheduler_inst.__scheduler_run_callbacks = &scheduler_run_callbacks;
   scheduler_inst.__scheduler_remove_task = &scheduler_remove_task;

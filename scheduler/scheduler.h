@@ -4,7 +4,7 @@
 #include "ischeduler.h"
 
 
-ischeduler_st* scheduler_init(scheduler_HAL_st *ptr);
+ischeduler_st* scheduler_init(scheduler_HAL_st *ptr, uint32_t);
 
 void scheduler_irq();
 

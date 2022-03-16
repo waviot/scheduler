@@ -24,6 +24,8 @@ struct watimer_callback_st
 };
 
 
+
+
 #define MAXCALLBACKS    20
 
 
@@ -31,14 +33,14 @@ struct watimer_callback_st
 #define MILLISECONDS(x) (x)
 
 
-typedef struct 
+typedef struct
 {
   void (* __global_irq_enable)(void);
   void (* __global_irq_disable)(void);
   void (* __cc_irq_enable)(uint8_t chan);
   void (* __cc_irq_disable)(uint8_t chan);
   void (* __loop_irq_enable)(void);
-  void (* __loop_irq_disable)(void); 
+  void (* __loop_irq_disable)(void);
   void (* __cc_set)(uint8_t chan, uint16_t data);
   uint16_t (* __cc_get)(uint8_t chan);
   uint16_t (* __cnt_get)(uint8_t chan);
@@ -51,7 +53,7 @@ extern watimer_HAL_st *watimer_hal;
 
 void watimer_set_HAL(watimer_HAL_st *);
 
-void watimer_init(void);
+void watimer_init(uint32_t clock_div);
 //void watimer_reg_func(uint8_t name, void *fn);
 void watimer_irq(void);
 void watimer_run_callbacks();
