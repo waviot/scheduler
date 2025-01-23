@@ -29,7 +29,7 @@ struct watimer_callback_st
 #define MAXCALLBACKS    20
 
 
-#define SECONDS(x) ((uint32_t)(x) * 1000)
+#define SECONDS(x) ((uint32_t)(x) * 1024)
 #define MILLISECONDS(x) (x)
 
 
