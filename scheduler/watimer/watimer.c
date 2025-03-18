@@ -18,19 +18,21 @@ void watimer_set_HAL(watimer_HAL_st *ptr)
 
 uint32_t watimer_update_time()
 {
+ 
+#ifdef WATIMER_CC32BIT
+      return (watimer_time = watimer_hal->__cnt_get(0));
+#else
     static uint32_t old_watimer_time = 0;
-
-
     watimer_time &= 0xffff0000;
     watimer_time += watimer_hal->__cnt_get(0);
-
     if(old_watimer_time > watimer_time)
-        watimer_time += 0x10000;
-
-     //   if((old_watimer_time == watimer_time) &&(watimer_time == 3085))
-     // watimer_time++;
-
+        watimer_time += 0x10000;    
     return (old_watimer_time = watimer_time);
+#endif
+
+  
+    
+
 }
 
 
@@ -77,12 +79,15 @@ static _Bool watimer_configure_next_irq_time()
   {
     watimer_hal->__cc_irq_enable(0);
     watimer_update_time();
-   //   if(watimer_time == 3085)
-   //   watimer_time++;
-    //if(((irq_time&0xffff) - ((watimer_time + MILLISECONDS(5))&0xffff)) < 0x8000)
     if(irq_time > (watimer_time + MILLISECONDS(5)))
     {
-      watimer_hal->__cc_set(0, irq_time&0xffff);
+#ifdef WATIMER_CC32BIT
+    watimer_hal->__cc_set(0, irq_time);
+#else
+    watimer_hal->__cc_set(0, irq_time&0xffff);  
+#endif
+      
+      
     }
     else
     {
@@ -100,8 +105,6 @@ static _Bool watimer_configure_next_irq_time()
   }
   else
   {
-    //timeout = 1;
-   // watimer_hal->__cc_set(0, watimer_hal->__cnt_get(1) + SECONDS(10));
   }
 
 
@@ -156,7 +159,14 @@ void watimer_run_callbacks()
          if(watimer_configure_next_irq_time()) watimer_run_callbacks();
          watimer_hal->__global_irq_enable();
 }
+
+#ifdef WATIMER_CC32BIT
+uint32_t diff;
+#else
 uint16_t diff;
+#endif
+
+
 _Bool watimer_can_sleep()
 {
   _Bool soon = 0;
