@@ -31,7 +31,7 @@ struct watimer_callback_st
 #define MILLISECONDS(x) (x)
 
 
-#ifdef WATIMER_CC32BIT
+#ifdef WATIMER_CC24BIT
 typedef struct
 {
   void (* __global_irq_enable)(void);

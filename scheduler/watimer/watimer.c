@@ -19,8 +19,13 @@ void watimer_set_HAL(watimer_HAL_st *ptr)
 uint32_t watimer_update_time()
 {
  
-#ifdef WATIMER_CC32BIT
-      return (watimer_time = watimer_hal->__cnt_get(0));
+#ifdef WATIMER_CC24BIT
+     static uint32_t old_watimer_time = 0;
+    watimer_time &= 0xff000000;
+    watimer_time += watimer_hal->__cnt_get(0);
+    if(old_watimer_time > watimer_time)
+        watimer_time += 0x1000000;    
+    return (old_watimer_time = watimer_time);
 #else
     static uint32_t old_watimer_time = 0;
     watimer_time &= 0xffff0000;
@@ -81,8 +86,8 @@ static _Bool watimer_configure_next_irq_time()
     watimer_update_time();
     if(irq_time > (watimer_time + MILLISECONDS(5)))
     {
-#ifdef WATIMER_CC32BIT
-    watimer_hal->__cc_set(0, irq_time);
+#ifdef WATIMER_CC24BIT
+    watimer_hal->__cc_set(0, irq_time&0xffffff);  
 #else
     watimer_hal->__cc_set(0, irq_time&0xffff);  
 #endif
@@ -160,7 +165,7 @@ void watimer_run_callbacks()
          watimer_hal->__global_irq_enable();
 }
 
-#ifdef WATIMER_CC32BIT
+#ifdef WATIMER_CC24BIT
 uint32_t diff;
 #else
 uint16_t diff;
